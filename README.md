@@ -2,6 +2,18 @@
 
 Simple client serveur app
 
-## To do :
+## Travail à faire :
 
-- 
+- télécharger le projet
+- lire le code et le commenter
+- executer et tester
+- proposer des améliorations du programme
+
+
+
+
+{{% alert title="Comment executer ?" color="primary" %}}
+- python serveur.py
+- python client.py
+{{% /alert %}}
+
