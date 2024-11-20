@@ -7,13 +7,8 @@ Simple client serveur app
 - télécharger le projet
 - lire le code et le commenter
 - executer et tester
+`python serveur.py`
+`python client.py`
 - proposer des améliorations du programme
 
-
-
-
-{{% alert title="Comment executer ?" color="primary" %}}
-- python serveur.py
-- python client.py
-{{% /alert %}}
 
