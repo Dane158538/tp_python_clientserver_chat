@@ -1,3 +1,4 @@
+import os
 import threading
 import socket
 import time
@@ -21,7 +22,13 @@ class Client():
             try:
                 data= self.socket.recv(1024).decode('UTF-8') #peut recevoir un message jusqu'à 1024 octets et le décode en UTF-8
             except socket.error:
-                print("Unable to receive data")
+                # eviter d'afficher l'erreur quand l'utilisateur 'QUIT'
+                if self.listening:
+                    print("Unable to receive data")
+                    self.tidy_up() 
+                    os._exit(0) #ferme le programme (pas que le thread) si le serveur est hors ligne
+                break
+
             self.handle_msg(data) #envoit les données reçues à la fonction handle_msg
             time.sleep(0.1)
 
@@ -35,14 +42,20 @@ class Client():
     def send(self, message):
         """Envoyer un message au serveur"""
         try:
+            if message == "QUIT":
+                self.socket.sendall(message.encode("UTF-8"))
+                self.tidy_up()
+                return
             username_result = re.search('^USERNAME (.*)$', message)
             if not username_result:
                 message= "{0}: {1}".format(self.username, message)
                 #si le message n'a pas d'username, on ajoute l'username au début du message
             self.socket.sendall(message.encode("UTF-8"))
             #envoit le message encodé en UTF-8 au serveur
-        except socket.error:
-            print("unable to send message")
+        except (socket.error, ConnectionResetError):
+            print("unable to send message, server might be offline.")
+            self.tidy_up()
+
 
     def tidy_up(self):
         """Ferme le socket et arrête le thread"""
