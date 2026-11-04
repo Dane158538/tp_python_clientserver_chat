@@ -73,9 +73,10 @@ class Client():
             self.tidy_up()
             #si le serveur ferme la connexion, on appelle à nouveau la fonction tidy_up()
         else:
-            print(data)
-            #sinon, on affiche le message reçu du serveur
-
+            if hasattr(self, "afficher_message"):
+                self.afficher_message(data)
+            else:
+                print(data)
 
 if __name__ == "__main__":
     """Demande à l'utilisateur de saisir son nom d'utilisateur, le serveur et le port, puis crée un client avec les informations fournies et écoute les messages du serveur"""

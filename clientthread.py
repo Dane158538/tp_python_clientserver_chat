@@ -1,4 +1,4 @@
-from socket import socket # utilisé pour communiquer entre ordinateurs
+import socket # utilisé pour communiquer entre ordinateurs
 import threading # utilisé pour créer des threads
 import re # utilisé pour les expressions régulières
 import time # utilisé pour faire des pauses
