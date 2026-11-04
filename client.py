@@ -4,6 +4,8 @@ import socket
 import time
 import re
 
+import inputValidate
+
 class Client():
 
     def __init__(self, username, server, port):
@@ -77,9 +79,11 @@ class Client():
 
 if __name__ == "__main__":
     """Demande à l'utilisateur de saisir son nom d'utilisateur, le serveur et le port, puis crée un client avec les informations fournies et écoute les messages du serveur"""
-    username= input("username: ")
-    server= input("server: ")
-    port= int(input("port: "))
+    print("Please enter following information to connect to the server:")
+    username= inputValidate.validateUsername()
+    server= inputValidate.validateServer() 
+    port= inputValidate.validatePort()
+    
     client= Client(username, server, port)
     client.listen() #écoute les messages du serveur
     message= ""
