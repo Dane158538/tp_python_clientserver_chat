@@ -3,15 +3,22 @@ import threading
 import socket
 import time
 import re
+import json
 
 import inputValidate
+import server
+
+server_list_json = "serverslist.json"
 
 class Client():
 
     def __init__(self, username, server, port):
         """Initialise le client avec l'username, l'adresse du serveur et le port du serveur"""
         self.socket= socket.socket(socket.AF_INET, socket.SOCK_STREAM) #créer un socket TCP
-        self.socket.connect((server, port)) #se connecte au serveur avec l'adresse et le port fourni
+        try:
+            self.socket.connect((server, port)) #se connecte au serveur avec l'adresse et le port fourni
+        except (socket.error, ConnectionRefusedError):
+            raise ConnectionError("Unable to connect to the server. Please check the server address and port.")
         self.username= username
         self.send("USERNAME {0}".format(username)) #envoit l'username au serveur
         self.listening= True
@@ -78,18 +85,93 @@ class Client():
             else:
                 print(data)
 
-if __name__ == "__main__":
-    """Demande à l'utilisateur de saisir son nom d'utilisateur, le serveur et le port, puis crée un client avec les informations fournies et écoute les messages du serveur"""
-    print("Please enter following information to connect to the server:")
+def run_server_target(port):
+    """Fonction exécutée par le thread pour créer et lancer le serveur"""
+    srv = server.Server(port)
+    srv.run()
+
+def initServerThread(port):
+    """Initialise un serveur dans un thread séparé."""
+    thread = threading.Thread(target=run_server_target, args=(port,))
+    thread.daemon = True
+    thread.start()
+
+def add_server():
+    port = 59001
+    existing_ports = [srv["port"] for srv in server_list]
+    while port in existing_ports:
+        port += 1
+    #choisi un port disponible pour le serveur
+    initServerThread(port)
+    with open(server_list_json, "w") as f:
+            server_list.append({"port": port, "count": 0})
+            json.dump(server_list, f) #rajoute le port du serveur à la liste des serveurs disponibles
+    print(f"Server is running on port {port}.")
+    return port
+
+def change_user_count(port, isDecrement = False):
+    """trouve le serveur concerné et enlève ou ajoute l'user du count"""
+    for server in server_list:
+        if server.get("port") == port:
+            current_count = server.get("count")
+            if isDecrement:
+                server["count"] = max(0, current_count-1)
+            else:
+                server["count"] = current_count +1
+            break
+    with open(server_list_json, "w") as f:
+        json.dump(server_list, f)
+
+def new_server_connection():
+    print("Starting a new server...")
+    port= add_server()
     username= inputValidate.validateUsername()
-    server= inputValidate.validateServer() 
-    port= inputValidate.validatePort()
-    
-    client= Client(username, server, port)
+    return port, username
+
+if __name__ == "__main__":
+    server_list = []
+    with open(server_list_json) as f:
+        server_list = json.load(f)
+    if server_list != []:
+            join = input("Do you want to join an existing server? (y/n): ")
+            if join.lower() == "y":
+                print("Servers available:")
+                for srv in server_list:
+                    print(" port: ", srv["port"],", connectés: ", srv["count"], " ." )
+                port= inputValidate.validatePort()
+                username= inputValidate.validateUsername()
+            else:
+                port, username = new_server_connection()
+    else:
+        port, username = new_server_connection()
+    try:
+        client= Client(username, "127.0.0.1", port)
+        change_user_count(port, False)
+    except ConnectionError as e:
+        print(e)
+        os._exit(1)
+
     client.listen() #écoute les messages du serveur
     message= ""
-    while message!="QUIT":
-        message= input()
-        client.send(message)
-        #si l'utilisateur saisit 'QUIT', le programme se termine et le socket est fermé
-        #sinon, le message est envoyé au serveur
+    try:
+        while message!="QUIT":
+            message= input()
+            client.send(message)
+            #si l'utilisateur saisit 'QUIT', le programme se termine et le socket est fermé
+            #sinon, le message est envoyé au serveur
+    finally: #prend en compte le Ctrl+C sur le terminal
+        change_user_count(port, True)
+
+        with open(server_list_json) as f:
+                server_list = json.load(f)
+
+        for i in range(len(server_list)):
+            if server_list[i].get('port') == port and server_list[i].get("count") == 0:
+                del server_list[i]
+                break
+        #supprime le serveur de la liste seulement si tous les users sont déconnectés
+
+        with open(server_list_json, "w") as f:
+            json.dump(server_list, f)
+            
+        os._exit(0)
