@@ -1,5 +1,6 @@
 import socket #utilisé pour communiquer entre ordinateurs
 import sys  #utilisé pour sortir du programme
+import threading
 import time #utilisé pour faire des pauses
 from clientthread import ClientListener #importation de la classe ClientListener du fichier clientthread.py
 
@@ -13,6 +14,7 @@ class Server():
         self.listener.listen(1)
         print("Listening on port", port)
         self.clients_sockets= []
+        self.lock= threading.Lock()  # Lock pour sécuriser l'accès/modification de clients_sockets
 
     #fonction qui écoute les clients et crée un thread pour chaque client
     def run(self):
@@ -22,7 +24,9 @@ class Server():
                 (client_socket, client_adress) = self.listener.accept()
             except socket.error:
                 sys.exit("Cannot connect clients")
-            self.clients_sockets.append(client_socket)
+            with self.lock: 
+                self.clients_sockets.append(client_socket)
+                # accès par un thread à la fois
             print("Start the thread for client:", client_adress)
             client_thread= ClientListener(self, client_socket, client_adress)
             client_thread.start()
@@ -30,16 +34,19 @@ class Server():
 
     #Retire un client de la liste lorsqu'il se déconnecte
     def remove_socket(self, socket):
-        self.clients_sockets.remove(socket)
+        with self.lock:
+            self.clients_sockets.remove(socket)
+            # accès par un thread à la fois
 
     #Affiche le message reçu et l'envoie à tous les clients connectés
     def echo(self, data):
         print("echoing:", data)
-        for sock in self.clients_sockets:
-            try:
-                sock.sendall(data.encode("UTF-8"))
-            except socket.error:
-                print("Cannot send the message")
+        with self.lock: # accès par un thread à la fois
+            for sock in self.clients_sockets:
+                try:
+                    sock.sendall(data.encode("UTF-8"))
+                except socket.error:
+                    print("Cannot send the message")
 
 
     # Démarre le serveur pour accepter les connexions
