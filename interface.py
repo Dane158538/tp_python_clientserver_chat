@@ -47,10 +47,11 @@ def afficher_messages():
     while not messages.empty():
         message = messages.get()
         zone_messages.insert(tk.END, message + "\n")
+        zone_messages.see(tk.END)
 
-    if client is None or not client.listening:
-        zone_messages.delete(1.0, tk.END)
-        zone_messages.insert(tk.END, "Disconnected from server. Please login.\n")
+    if client is not None and not client.listening:
+        deconnexion()
+
     fenetre.after(100, afficher_messages)
 
 # fonction qui récupère les informations de l'utilisateur et les affiche
@@ -62,15 +63,42 @@ def connexion():
     username = champ_username.get()
     server = champ_server.get()
     port = champ_port.get()
-    client = Client(username, server, int(port))
-    client.afficher_message = messages.put
-    client.listen()
+    if username.strip() == "":
+        messagebox.showerror("Erreur", "Le pseudo ne peut pas être vide")
+        return
+    try:
+        ipaddress.ip_address(server)
+    except ValueError:
+        messagebox.showerror("Erreur", "Adresse IP invalide")
+        return
+    try:
+        port = int(port)
+        if port < 1 or port > 65535:
+            messagebox.showerror("Erreur", "Port invalide")
+            return
+    except ValueError:
+        messagebox.showerror("Erreur", "Le port doit être un nombre")
+        return
+    try:
+        client = Client(username, server, port)
+        client.afficher_message = messages.put
+        client.listen()
+    except OSError:
+        client = None
+        messagebox.showerror("Erreur", "Impossible de se connecter")
+        return
+    info_client.config(text=f"Pseudo : {username} | IP : {server} | Port : {port}")
+    page_connexion.pack_forget()
+    page_chat.pack(fill="both", expand=True)    
 
 def deconnexion():
     global client
     if client is not None:
-        client.send("QUIT")
+        if client.listening:
+            client.send("QUIT")
         client = None
+    page_chat.pack_forget()
+    page_connexion.pack(fill="both", expand=True)
 
 # fonction qui envoie le message écrit par l'utilisateur 
 def envoyer():
@@ -86,27 +114,31 @@ bouton_connexion = tk.Button(
     text="Connexion",
     command=connexion
 )
-# bouton de déconnexion 
-bouton_deconnexion = tk.Button(
-    cadre_connexion,
-    text="Déconnexion",
-    command=deconnexion
-)
 
 bouton_connexion.grid(row=2, column=0, columnspan=3, pady=10)
-bouton_deconnexion.grid(row=2, column=2, columnspan=3, pady=10)
+
+# info client
+info_client = tk.Label(page_chat, text="", bg="#1e2430", fg="white")
+info_client.pack(pady=10)
+
+# bouton déconnexion 
+bouton_deconnexion = tk.Button(page_chat, text="Déconnexion", command=deconnexion)
+bouton_deconnexion.pack(pady=5)
 
 # Zone pour afficher les messages
-zone_messages = tk.Text(fenetre, height=10, width=40, bg="#2b3444", fg="white")
-zone_messages.pack(pady=10)
+zone_messages = tk.Text(page_chat, height=10, width=40, bg="#2b3444", fg="white")
+zone_messages.pack(fill="both", expand=True, padx=10, pady=10)
 
 afficher_messages() 
 
-champ_message = tk.Entry(page_chat, width=40, bg="#2b3444", fg="white")
-champ_message.pack(pady=5)
+cadre_message = tk.Frame(page_chat, bg="#1e2430")
+cadre_message.pack(fill="x", padx=10, pady=10)
 
-bouton_envoyer = tk.Button(page_chat, text="Envoyer", command=envoyer)
-bouton_envoyer.pack(pady=5)
+champ_message = tk.Entry(cadre_message, bg="#2b3444", fg="white")
+champ_message.pack(side="left", fill="x", expand=True, padx=5)
+
+bouton_envoyer = tk.Button(cadre_message, text="Envoyer", command=envoyer)
+bouton_envoyer.pack(side="right")
 
 champ_message.bind("<Return>", lambda event: envoyer())
 
