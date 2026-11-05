@@ -130,6 +130,13 @@ def deconnexion():
         if client.listening:
             client.send("QUIT")
     modifier_compteur(port_choisi, True)
+    serveurs = charger_serveurs()
+    for i in range(len(serveurs)):
+        if serveurs[i].get('port') == port_choisi and serveurs[i].get("count") == 0:
+            del serveurs[i]
+            break
+    with open("serverslist.json", "w") as f:
+        json.dump(serveurs, f)
     client = None
     page_chat.pack_forget()
     page_connexion.pack_forget()

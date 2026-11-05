@@ -97,6 +97,8 @@ def initServerThread(port):
     thread.start()
 
 def add_server():
+    with open(server_list_json) as f:
+        server_list = json.load(f)
     port = 59001
     existing_ports = [srv["port"] for srv in server_list]
     while port in existing_ports:
