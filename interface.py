@@ -38,6 +38,9 @@ def afficher_messages():
         message = messages.get()
         zone_messages.insert(tk.END, message + "\n")
 
+    if client is None or not client.listening:
+        zone_messages.delete(1.0, tk.END)
+        zone_messages.insert(tk.END, "Disconnected from server. Please login.\n")
     fenetre.after(100, afficher_messages)
 
 # fonction qui récupère les informations de l'utilisateur et les affiche
@@ -49,7 +52,13 @@ def connexion():
     client = Client(username, server, int(port))
     client.afficher_message = messages.put
     client.listen()
-    
+
+def deconnexion():
+    global client
+    if client is not None:
+        client.send("QUIT")
+        client = None
+
 # fonction qui envoie le message écrit par l'utilisateur 
 def envoyer():
     message = champ_message.get()
@@ -64,8 +73,15 @@ bouton_connexion = tk.Button(
     text="Connexion",
     command=connexion
 )
+# bouton de déconnexion 
+bouton_deconnexion = tk.Button(
+    cadre_connexion,
+    text="Déconnexion",
+    command=deconnexion
+)
 
 bouton_connexion.grid(row=2, column=0, columnspan=3, pady=10)
+bouton_deconnexion.grid(row=2, column=2, columnspan=3, pady=10)
 
 # Zone pour afficher les messages
 zone_messages = tk.Text(fenetre, height=10, width=40, bg="#2b3444", fg="white")
