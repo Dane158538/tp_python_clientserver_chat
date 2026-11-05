@@ -29,7 +29,7 @@ class ClientListener(threading.Thread):
                 break
             self.handle_msg(data)
             time.sleep(0.1)
-        print("Ending client thread for", self.address)
+        self.server.log(f"Ending client thread for {self.address}")
  
     # déconnecte le client et prévient les autres clients
     def quit(self):
@@ -47,7 +47,7 @@ class ClientListener(threading.Thread):
 
     # gère les messages reçus selon leur contenu
     def handle_msg(self, data):
-        print(self.address, "sent :", data)
+        self.server.log(f"{self.address} sent : {data}")
         username_result = re.search('^USERNAME (.*)$', data) # vérifie si le client envoie un nom d'utilisateur
         
         # déconnecte le client s'il envoie quit ou un message vide sinon affiche l'envoie à tous les clients connectés
