@@ -1,0 +1,32 @@
+--- Serveur demarre sur le port 59002 ---
+[2026-11-05 17:45:07] Listening on port 59002
+[2026-11-05 17:45:07] listening new customers
+[2026-11-05 17:45:21] Start the thread for client: ('127.0.0.1', 3114)
+[2026-11-05 17:45:21] ('127.0.0.1', 3114) sent : USERNAME rest
+[2026-11-05 17:45:21] echoing: rest has joined.
+
+[2026-11-05 17:45:21] listening new customers
+[2026-11-05 17:48:08] echoing: rest has quit
+
+[2026-11-05 17:48:08] Ending client thread for ('127.0.0.1', 3114)
+[2026-11-05 17:49:08] Start the thread for client: ('127.0.0.1', 29437)
+[2026-11-05 17:49:08] ('127.0.0.1', 29437) sent : USERNAME re
+[2026-11-05 17:49:08] echoing: re has joined.
+
+[2026-11-05 17:49:08] listening new customers
+[2026-11-05 17:49:11] ('127.0.0.1', 29437) sent : re: test
+[2026-11-05 17:49:11] echoing: re: test
+[2026-11-05 17:49:23] Start the thread for client: ('127.0.0.1', 29452)
+[2026-11-05 17:49:23] ('127.0.0.1', 29452) sent : USERNAME ee
+[2026-11-05 17:49:23] echoing: ee has joined.
+
+[2026-11-05 17:49:23] listening new customers
+[2026-11-05 17:49:26] ('127.0.0.1', 29452) sent : ee: e
+[2026-11-05 17:49:26] echoing: ee: e
+[2026-11-05 17:49:31] ('127.0.0.1', 29437) sent : QUIT
+[2026-11-05 17:49:31] echoing: re has quit
+
+[2026-11-05 17:49:31] Ending client thread for ('127.0.0.1', 29437)
+[2026-11-05 17:49:36] echoing: ee has quit
+
+[2026-11-05 17:49:36] Ending client thread for ('127.0.0.1', 29452)

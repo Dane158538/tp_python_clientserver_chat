@@ -1,23 +1,11 @@
 --- Serveur demarre sur le port 59001 ---
-[2026-11-05 15:37:22] Listening on port 59001
-[2026-11-05 15:37:22] listening new customers
-[2026-11-05 15:38:03] Start the thread for client: ('127.0.0.1', 17880)
-[2026-11-05 15:38:03] ('127.0.0.1', 17880) sent : USERNAME test
-[2026-11-05 15:38:03] echoing: test has joined.
+[2026-11-05 17:35:32] Listening on port 59001
+[2026-11-05 17:35:32] listening new customers
+[2026-11-05 17:35:53] Start the thread for client: ('127.0.0.1', 20587)
+[2026-11-05 17:35:53] ('127.0.0.1', 20587) sent : USERNAME test
+[2026-11-05 17:35:53] echoing: test has joined.
 
-[2026-11-05 15:38:03] listening new customers
-[2026-11-05 15:38:05] ('127.0.0.1', 17880) sent : QUIT
-[2026-11-05 15:38:05] echoing: test has quit
+[2026-11-05 17:35:53] listening new customers
+[2026-11-05 17:35:58] echoing: test has quit
 
-[2026-11-05 15:38:05] Ending client thread for ('127.0.0.1', 17880)
-[2026-11-05 15:38:07] Start the thread for client: ('127.0.0.1', 17881)
-[2026-11-05 15:38:07] ('127.0.0.1', 17881) sent : USERNAME test
-[2026-11-05 15:38:07] echoing: test has joined.
-
-[2026-11-05 15:38:07] listening new customers
-[2026-11-05 15:38:10] ('127.0.0.1', 17881) sent : test: tets
-[2026-11-05 15:38:10] echoing: test: tets
-[2026-11-05 15:38:12] ('127.0.0.1', 17881) sent : QUIT
-[2026-11-05 15:38:12] echoing: test has quit
-
-[2026-11-05 15:38:13] Ending client thread for ('127.0.0.1', 17881)
+[2026-11-05 17:35:58] Ending client thread for ('127.0.0.1', 20587)
