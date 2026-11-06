@@ -113,6 +113,8 @@ def add_server():
 
 def change_user_count(port, isDecrement = False):
     """trouve le serveur concerné et enlève ou ajoute l'user du count"""
+    with open(server_list_json) as f:
+        server_list = json.load(f)
     for server in server_list:
         if server.get("port") == port:
             current_count = server.get("count")
